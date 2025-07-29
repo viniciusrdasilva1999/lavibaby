@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, X, ShoppingBag, Heart, User, Search, Shield } from 'lucide-react';
+import { Menu, X, ShoppingBag, Heart, User, Search, Shield, Settings } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import AdminLogin from './AdminLogin';
 import UserLogin from './UserLogin';
 import UserRegistration from './UserRegistration';
+import UserProfile from './UserProfile';
 
 interface NavbarProps {
   cartItemCount: number;
@@ -16,12 +17,18 @@ const Navbar: React.FC<NavbarProps> = ({ cartItemCount, onCartClick }) => {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [showUserRegistration, setShowUserRegistration] = useState(false);
+  const [showUserProfile, setShowUserProfile] = useState(false);
   const { user, isAdmin, isLoggedIn, logout, siteSettings } = useAuth();
 
   const handleUserIconClick = () => {
     if (isLoggedIn) {
-      // Se estiver logado, mostrar menu de usuário ou fazer logout
-      logout();
+      if (isAdmin) {
+        // Admin já tem acesso ao dashboard
+        return;
+      } else {
+        // Usuário normal - mostrar perfil
+        setShowUserProfile(true);
+      }
     } else {
       // Se não estiver logado, mostrar login
       setShowUserLogin(true);
@@ -110,14 +117,16 @@ const Navbar: React.FC<NavbarProps> = ({ cartItemCount, onCartClick }) => {
             <motion.button 
               whileHover={{ scale: 1.2, rotate: 10 }}
               whileTap={{ scale: 0.9 }}
-              onClick={isAdmin ? () => setShowAdminLogin(true) : handleUserIconClick}
+              onClick={handleUserIconClick}
               className="p-2 text-gray-700 hover:text-pink-500 transition-colors"
             >
-              {isAdmin ? (
-                <Shield size={20} />
-              ) : isLoggedIn ? (
+              {isLoggedIn ? (
                 <div className="relative">
-                  <User size={20} className="text-pink-500" />
+                  {isAdmin ? (
+                    <Shield size={20} className="text-purple-500" />
+                  ) : (
+                    <Settings size={20} className="text-pink-500" />
+                  )}
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
                 </div>
               ) : (
@@ -243,6 +252,17 @@ const Navbar: React.FC<NavbarProps> = ({ cartItemCount, onCartClick }) => {
       <UserRegistration
         onClose={() => setShowUserRegistration(false)}
         onSuccess={() => setShowUserRegistration(false)}
+      />
+    )}
+
+    {/* User Profile Modal */}
+    {showUserProfile && (
+      <UserProfile
+        onClose={() => setShowUserProfile(false)}
+        onLogout={() => {
+          setShowUserProfile(false);
+          logout();
+        }}
       />
     )}
     </>

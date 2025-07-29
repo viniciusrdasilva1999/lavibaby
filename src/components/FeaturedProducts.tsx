@@ -24,7 +24,7 @@ interface FeaturedProductsProps {
 }
 
 const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart }) => {
-  const { isLoggedIn, siteSettings } = useAuth();
+  const { siteSettings } = useAuth();
   const [selectedProduct, setSelectedProduct] = React.useState<Product | null>(null);
   const [showProductModal, setShowProductModal] = React.useState(false);
 

@@ -27,7 +27,7 @@ const AppContent = () => {
   const [showUserRegistration, setShowUserRegistration] = useState(false);
 
   const handleAddToCart = (product: any, size: string, quantity: number) => {
-    if (!user) {
+    if (!isLoggedIn) {
       setShowUserRegistration(true);
       return;
     }
@@ -36,7 +36,7 @@ const AppContent = () => {
   };
 
   const handleCheckout = () => {
-    if (!user) {
+    if (!isLoggedIn) {
       setShowUserRegistration(true);
       return;
     }

@@ -58,6 +58,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isLoggedIn: boolean;
   isLoading: boolean;
+  updateUserProfile: (userData: User) => void;
   siteSettings: SiteSettings;
   updateSiteSettings: (settings: SiteSettings) => void;
 }
@@ -196,6 +197,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('user');
   };
 
+  const updateUserProfile = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+    
+    // Atualizar também na lista de usuários registrados
+    const updatedUsers = registeredUsers.map(u => 
+      u.user.id === userData.id ? { ...u, user: userData } : u
+    );
+    setRegisteredUsers(updatedUsers);
+    localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+  };
+
   const updateSiteSettings = (settings: SiteSettings) => {
     setSiteSettings(settings);
     localStorage.setItem('siteSettings', JSON.stringify(settings));
@@ -214,6 +227,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isAdmin, 
       isLoggedIn, 
       isLoading, 
+      updateUserProfile,
       siteSettings, 
       updateSiteSettings 
     }}>
