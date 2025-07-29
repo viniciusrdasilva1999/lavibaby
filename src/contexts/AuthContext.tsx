@@ -23,13 +23,28 @@ interface User {
   email: string;
   role: 'admin' | 'user';
   name: string;
+  cpf?: string;
+  telefone?: string;
+  endereco?: {
+    cep: string;
+    endereco: string;
+    numero: string;
+    complemento: string;
+    bairro: string;
+    cidade: string;
+    estado: string;
+  };
+  aceitaNewsletter?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
+  loginUser: (email: string, password: string) => Promise<boolean>;
+  registerUser: (userData: Omit<User, 'id'>, password: string) => void;
   logout: () => void;
   isAdmin: boolean;
+  isLoggedIn: boolean;
   isLoading: boolean;
   siteSettings: SiteSettings;
   updateSiteSettings: (settings: SiteSettings) => void;
@@ -48,6 +63,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [registeredUsers, setRegisteredUsers] = useState<Array<{user: User, password: string}>>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
     companyName: 'LaviBaby',
     phone: '(11) 99999-9999',
@@ -81,9 +97,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Verificar se há um usuário logado no localStorage
     const savedUser = localStorage.getItem('user');
+    const savedUsers = localStorage.getItem('registeredUsers');
     const savedSettings = localStorage.getItem('siteSettings');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
+    }
+    if (savedUsers) {
+      setRegisteredUsers(JSON.parse(savedUsers));
     }
     if (savedSettings) {
       setSiteSettings(JSON.parse(savedSettings));
@@ -108,6 +128,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return false;
   };
 
+  const loginUser = async (email: string, password: string): Promise<boolean> => {
+    setIsLoading(true);
+    
+    // Simular delay de autenticação
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Verificar usuários registrados
+    const foundUser = registeredUsers.find(
+      u => u.user.email === email && u.password === password
+    );
+    
+    if (foundUser) {
+      setUser(foundUser.user);
+      localStorage.setItem('user', JSON.stringify(foundUser.user));
+      setIsLoading(false);
+      return true;
+    }
+    
+    setIsLoading(false);
+    return false;
+  };
+
+  const registerUser = (userData: Omit<User, 'id'>, password: string) => {
+    const newUser: User = {
+      ...userData,
+      id: Date.now().toString()
+    };
+    
+    const newUserData = { user: newUser, password };
+    const updatedUsers = [...registeredUsers, newUserData];
+    
+    setRegisteredUsers(updatedUsers);
+    localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+    
+    // Fazer login automaticamente após registro
+    setUser(newUser);
+    localStorage.setItem('user', JSON.stringify(newUser));
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
@@ -119,9 +178,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const isAdmin = user?.role === 'admin';
+  const isLoggedIn = !!user;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAdmin, isLoading, siteSettings, updateSiteSettings }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      loginUser, 
+      registerUser, 
+      logout, 
+      isAdmin, 
+      isLoggedIn, 
+      isLoading, 
+      siteSettings, 
+      updateSiteSettings 
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,8 +1,24 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Star, ShoppingCart, Heart, Eye } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import UserLogin from './UserLogin';
+import UserRegistration from './UserRegistration';
 
 const FeaturedProducts = () => {
+  const { isLoggedIn } = useAuth();
+  const [showLoginModal, setShowLoginModal] = React.useState(false);
+  const [showRegistrationModal, setShowRegistrationModal] = React.useState(false);
+
+  const handleAddToCart = () => {
+    if (!isLoggedIn) {
+      setShowRegistrationModal(true);
+    } else {
+      // Adicionar ao carrinho
+      alert('Produto adicionado ao carrinho!');
+    }
+  };
+
   const products = [
     {
       id: 1,
@@ -175,6 +191,7 @@ const FeaturedProducts = () => {
                 <motion.button
                   whileHover={{ scale: 1.02, boxShadow: "0 10px 25px rgba(168, 85, 247, 0.3)" }}
                   whileTap={{ scale: 0.98 }}
+                  onClick={handleAddToCart}
                   className="w-full bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2 relative overflow-hidden group"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-700 via-pink-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -203,6 +220,26 @@ const FeaturedProducts = () => {
           </motion.button>
         </motion.div>
       </div>
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <UserLogin
+          onClose={() => setShowLoginModal(false)}
+          onSwitchToRegister={() => {
+            setShowLoginModal(false);
+            setShowRegistrationModal(true);
+          }}
+          onSuccess={() => setShowLoginModal(false)}
+        />
+      )}
+
+      {/* Registration Modal */}
+      {showRegistrationModal && (
+        <UserRegistration
+          onClose={() => setShowRegistrationModal(false)}
+          onSuccess={() => setShowRegistrationModal(false)}
+        />
+      )}
     </section>
   );
 };
