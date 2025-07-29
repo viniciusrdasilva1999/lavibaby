@@ -27,8 +27,7 @@ import {
   Percent,
   Image,
   Link,
-  Info,
-  Upload
+  Info
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
