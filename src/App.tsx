@@ -118,14 +118,6 @@ const AppContent = () => {
         />
       )}
     </>
-      <Hero />
-      <Categories />
-      <FeaturedProducts />
-      <About />
-      <Testimonials />
-      <Newsletter />
-      <Footer />
-    </div>
   );
 };
 
