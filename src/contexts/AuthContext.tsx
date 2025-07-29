@@ -16,6 +16,18 @@ interface SiteSettings {
   aboutDescription: string;
   freeShippingMinValue: number;
   discountPercentage: number;
+  logoUrl: string;
+  buttonLinks: {
+    verColecao: string;
+    ofertas: string;
+    verOfertas: string;
+    comprarAgora: string;
+    queroDesconto: string;
+    falarWhatsApp: string;
+    verTodosProdutos: string;
+    baixarApp: string;
+    criarConta: string;
+  };
 }
 
 interface User {
@@ -79,7 +91,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     aboutTitle: 'Por que escolher a LaviBaby?',
     aboutDescription: 'Somos uma loja especializada em roupas infantis que combina estilo, conforto e qualidade. Nossa missão é fazer com que cada criança se sinta especial e confiante.',
     freeShippingMinValue: 150,
-    discountPercentage: 20
+    discountPercentage: 20,
+    logoUrl: '/LOGO HORIZONTAL TRANSPARENTE.png',
+    buttonLinks: {
+      verColecao: '#categorias',
+      ofertas: '#produtos',
+      verOfertas: '#produtos',
+      comprarAgora: '#produtos',
+      queroDesconto: '#newsletter',
+      falarWhatsApp: 'https://wa.me/5511999999999',
+      verTodosProdutos: '#produtos',
+      baixarApp: '#',
+      criarConta: '#'
+    }
   });
 
   // Credenciais de admin (em produção, isso deveria vir de um backend seguro)

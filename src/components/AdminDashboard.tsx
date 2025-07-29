@@ -24,7 +24,11 @@ import {
   Type,
   FileText,
   DollarSign,
-  Percent
+  Percent,
+  Image,
+  Link,
+  Info,
+  Upload
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -130,7 +134,8 @@ const AdminDashboard = () => {
 
   const tabs = [
     { id: 'products', label: 'Produtos', icon: Package },
-    { id: 'settings', label: 'Configurações', icon: Settings }
+    { id: 'settings', label: 'Configurações', icon: Settings },
+    { id: 'design', label: 'Design & Links', icon: Image }
   ];
 
   return (
@@ -279,6 +284,153 @@ const AdminDashboard = () => {
           </div>
         )}
 
+        {/* Design & Links Tab */}
+        {activeTab === 'design' && (
+          <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-lg p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">Design & Links do Site</h2>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  setTempSettings(siteSettings);
+                  setEditingSettings(true);
+                }}
+                className="flex items-center space-x-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-xl hover:shadow-lg transition-all"
+              >
+                <Edit size={20} />
+                <span>Editar Design & Links</span>
+              </motion.button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Logo Configuration */}
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-gray-800 flex items-center space-x-2">
+                  <Image className="text-pink-500" size={24} />
+                  <span>Configuração da Logo</span>
+                </h3>
+                
+                <div className="space-y-4">
+                  <div className="p-4 bg-gray-50 rounded-xl">
+                    <label className="text-sm font-medium text-gray-600 mb-2 block">Logo Atual</label>
+                    <div className="flex items-center space-x-4">
+                      <img 
+                        src={siteSettings.logoUrl} 
+                        alt="Logo atual" 
+                        className="h-16 w-auto bg-white p-2 rounded-lg shadow-sm"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/LOGO HORIZONTAL TRANSPARENTE.png';
+                        }}
+                      />
+                      <div>
+                        <p className="text-sm text-gray-600">Tamanho recomendado:</p>
+                        <p className="text-xs text-gray-500">• Largura: 200-400px</p>
+                        <p className="text-xs text-gray-500">• Altura: 60-120px</p>
+                        <p className="text-xs text-gray-500">• Formato: PNG com fundo transparente</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                    <div className="flex items-start space-x-3">
+                      <Info className="text-blue-500 mt-1" size={20} />
+                      <div>
+                        <h4 className="font-semibold text-blue-800 mb-2">📋 Manual da Logo</h4>
+                        <div className="text-sm text-blue-700 space-y-1">
+                          <p><strong>1.</strong> Prepare sua logo em PNG com fundo transparente</p>
+                          <p><strong>2.</strong> Tamanho ideal: 300x90 pixels</p>
+                          <p><strong>3.</strong> Faça upload para um serviço como:</p>
+                          <p className="ml-4">• <a href="https://imgur.com" target="_blank" className="underline">Imgur.com</a> (gratuito)</p>
+                          <p className="ml-4">• <a href="https://postimg.cc" target="_blank" className="underline">PostImg.cc</a> (gratuito)</p>
+                          <p><strong>4.</strong> Copie o link direto da imagem</p>
+                          <p><strong>5.</strong> Cole no campo "URL da Logo" abaixo</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 bg-gray-50 rounded-xl">
+                    <label className="text-sm font-medium text-gray-600">URL da Logo</label>
+                    <p className="text-gray-800 break-all">{siteSettings.logoUrl}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Button Links Configuration */}
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-gray-800 flex items-center space-x-2">
+                  <Link className="text-pink-500" size={24} />
+                  <span>Links dos Botões</span>
+                </h3>
+                
+                <div className="space-y-4">
+                  <div className="p-4 bg-gray-50 rounded-xl">
+                    <label className="text-sm font-medium text-gray-600">Ver Coleção</label>
+                    <p className="text-gray-800">{siteSettings.buttonLinks.verColecao}</p>
+                  </div>
+                  
+                  <div className="p-4 bg-gray-50 rounded-xl">
+                    <label className="text-sm font-medium text-gray-600">Ofertas Especiais</label>
+                    <p className="text-gray-800">{siteSettings.buttonLinks.ofertas}</p>
+                  </div>
+                  
+                  <div className="p-4 bg-gray-50 rounded-xl">
+                    <label className="text-sm font-medium text-gray-600">Ver Ofertas</label>
+                    <p className="text-gray-800">{siteSettings.buttonLinks.verOfertas}</p>
+                  </div>
+                  
+                  <div className="p-4 bg-gray-50 rounded-xl">
+                    <label className="text-sm font-medium text-gray-600">Comprar Agora</label>
+                    <p className="text-gray-800">{siteSettings.buttonLinks.comprarAgora}</p>
+                  </div>
+                  
+                  <div className="p-4 bg-gray-50 rounded-xl">
+                    <label className="text-sm font-medium text-gray-600">Quero Desconto</label>
+                    <p className="text-gray-800">{siteSettings.buttonLinks.queroDesconto}</p>
+                  </div>
+                  
+                  <div className="p-4 bg-gray-50 rounded-xl">
+                    <label className="text-sm font-medium text-gray-600">Falar no WhatsApp</label>
+                    <p className="text-gray-800">{siteSettings.buttonLinks.falarWhatsApp}</p>
+                  </div>
+                  
+                  <div className="p-4 bg-gray-50 rounded-xl">
+                    <label className="text-sm font-medium text-gray-600">Ver Todos Produtos</label>
+                    <p className="text-gray-800">{siteSettings.buttonLinks.verTodosProdutos}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Links Guide */}
+            <div className="mt-8 p-6 bg-green-50 border border-green-200 rounded-xl">
+              <div className="flex items-start space-x-3">
+                <Info className="text-green-500 mt-1" size={20} />
+                <div>
+                  <h4 className="font-semibold text-green-800 mb-3">📖 Guia de Links</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-green-700">
+                    <div>
+                      <p><strong>Links Internos (seções do site):</strong></p>
+                      <p>• <code>#inicio</code> - Ir para o topo</p>
+                      <p>• <code>#categorias</code> - Seção categorias</p>
+                      <p>• <code>#produtos</code> - Seção produtos</p>
+                      <p>• <code>#sobre</code> - Seção sobre</p>
+                      <p>• <code>#newsletter</code> - Newsletter</p>
+                    </div>
+                    <div>
+                      <p><strong>Links Externos:</strong></p>
+                      <p>• <code>https://wa.me/5511999999999</code> - WhatsApp</p>
+                      <p>• <code>https://instagram.com/seu_perfil</code> - Instagram</p>
+                      <p>• <code>https://seu-site.com/loja</code> - Loja externa</p>
+                      <p>• <code>mailto:contato@email.com</code> - Email</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Settings Tab */}
         {activeTab === 'settings' && (
           <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-lg p-6">
@@ -804,6 +956,99 @@ const AdminDashboard = () => {
                     type="number"
                     value={tempSettings.discountPercentage}
                     onChange={(e) => setTempSettings({...tempSettings, discountPercentage: Number(e.target.value)})}
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
+                  />
+                </div>
+              </div>
+
+              {/* Logo Configuration */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-gray-800">Configuração da Logo</h4>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">URL da Logo</label>
+                  <input
+                    type="url"
+                    value={tempSettings.logoUrl}
+                    onChange={(e) => setTempSettings({...tempSettings, logoUrl: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
+                    placeholder="https://exemplo.com/logo.png"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Tamanho recomendado: 300x90px, formato PNG</p>
+                </div>
+              </div>
+
+              {/* Button Links Configuration */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-gray-800">Links dos Botões</h4>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Ver Coleção</label>
+                  <input
+                    type="text"
+                    value={tempSettings.buttonLinks.verColecao}
+                    onChange={(e) => setTempSettings({...tempSettings, buttonLinks: {...tempSettings.buttonLinks, verColecao: e.target.value}})}
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Ofertas Especiais</label>
+                  <input
+                    type="text"
+                    value={tempSettings.buttonLinks.ofertas}
+                    onChange={(e) => setTempSettings({...tempSettings, buttonLinks: {...tempSettings.buttonLinks, ofertas: e.target.value}})}
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Ver Ofertas</label>
+                  <input
+                    type="text"
+                    value={tempSettings.buttonLinks.verOfertas}
+                    onChange={(e) => setTempSettings({...tempSettings, buttonLinks: {...tempSettings.buttonLinks, verOfertas: e.target.value}})}
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Comprar Agora</label>
+                  <input
+                    type="text"
+                    value={tempSettings.buttonLinks.comprarAgora}
+                    onChange={(e) => setTempSettings({...tempSettings, buttonLinks: {...tempSettings.buttonLinks, comprarAgora: e.target.value}})}
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Quero Desconto</label>
+                  <input
+                    type="text"
+                    value={tempSettings.buttonLinks.queroDesconto}
+                    onChange={(e) => setTempSettings({...tempSettings, buttonLinks: {...tempSettings.buttonLinks, queroDesconto: e.target.value}})}
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Falar no WhatsApp</label>
+                  <input
+                    type="text"
+                    value={tempSettings.buttonLinks.falarWhatsApp}
+                    onChange={(e) => setTempSettings({...tempSettings, buttonLinks: {...tempSettings.buttonLinks, falarWhatsApp: e.target.value}})}
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
+                    placeholder="https://wa.me/5511999999999"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Ver Todos Produtos</label>
+                  <input
+                    type="text"
+                    value={tempSettings.buttonLinks.verTodosProdutos}
+                    onChange={(e) => setTempSettings({...tempSettings, buttonLinks: {...tempSettings.buttonLinks, verTodosProdutos: e.target.value}})}
                     className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
                   />
                 </div>

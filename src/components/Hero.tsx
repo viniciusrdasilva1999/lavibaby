@@ -90,6 +90,7 @@ const Hero = () => {
               <motion.button
                 whileHover={{ scale: 1.05, boxShadow: "0 15px 35px rgba(236, 72, 153, 0.4)" }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => window.location.href = siteSettings.buttonLinks.verColecao}
                 className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2 relative overflow-hidden group"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -100,6 +101,7 @@ const Hero = () => {
               <motion.button
                 whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(168, 85, 247, 0.3)" }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => window.location.href = siteSettings.buttonLinks.ofertas}
                 className="border-2 border-pink-500 text-pink-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-pink-500 hover:text-white transition-all duration-300 relative overflow-hidden group"
               >
                 <div className="absolute inset-0 bg-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
@@ -209,6 +211,7 @@ const Hero = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={() => window.location.href = siteSettings.buttonLinks.comprarAgora}
                   className="bg-white text-pink-600 px-6 py-3 rounded-full font-semibold shadow-lg"
                 >
                   🛍️ Comprar Agora

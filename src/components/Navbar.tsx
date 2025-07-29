@@ -11,7 +11,7 @@ const Navbar = () => {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [showUserRegistration, setShowUserRegistration] = useState(false);
-  const { user, isAdmin, isLoggedIn, logout } = useAuth();
+  const { user, isAdmin, isLoggedIn, logout, siteSettings } = useAuth();
 
   const handleUserIconClick = () => {
     if (isLoggedIn) {
@@ -38,9 +38,12 @@ const Navbar = () => {
             className="flex items-center space-x-3"
           >
             <img 
-              src="/LOGO HORIZONTAL TRANSPARENTE.png" 
+              src={siteSettings.logoUrl} 
               alt="LaviBaby" 
               className="h-16 w-auto hover:scale-105 transition-transform duration-300 cursor-pointer"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/LOGO HORIZONTAL TRANSPARENTE.png';
+              }}
             />
           </motion.div>
 

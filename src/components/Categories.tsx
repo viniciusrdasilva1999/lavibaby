@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext';
 
 const categories = [
   {
@@ -29,6 +30,8 @@ const categories = [
 ];
 
 const Categories = () => {
+  const { siteSettings } = useAuth();
+
   return (
     <section id="categorias" className="py-20 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden">
       {/* Candy Background Elements */}
@@ -144,6 +147,7 @@ const Categories = () => {
             <motion.button
               whileHover={{ scale: 1.1, boxShadow: "0 10px 30px rgba(255,255,255,0.3)" }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => window.location.href = siteSettings.buttonLinks.verOfertas}
               className="bg-white text-purple-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors"
             >
               🛒 Ver Ofertas Imperdíveis

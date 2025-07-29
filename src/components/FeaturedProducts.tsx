@@ -6,7 +6,7 @@ import UserLogin from './UserLogin';
 import UserRegistration from './UserRegistration';
 
 const FeaturedProducts = () => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, siteSettings } = useAuth();
   const [showLoginModal, setShowLoginModal] = React.useState(false);
   const [showRegistrationModal, setShowRegistrationModal] = React.useState(false);
 
@@ -213,6 +213,7 @@ const FeaturedProducts = () => {
           <motion.button
             whileHover={{ scale: 1.05, boxShadow: "0 15px 35px rgba(168, 85, 247, 0.4)" }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => window.location.href = siteSettings.buttonLinks.verTodosProdutos}
             className="bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white px-12 py-4 rounded-full text-lg font-bold hover:shadow-lg transition-all duration-300 relative overflow-hidden group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-purple-700 via-pink-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
