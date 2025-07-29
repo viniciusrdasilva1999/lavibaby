@@ -91,7 +91,14 @@ const Newsletter = () => {
               <motion.button
                 whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(255,255,255,0.3)" }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => window.location.href = siteSettings.buttonLinks.queroDesconto}
+                onClick={() => {
+                  const element = document.querySelector(siteSettings.buttonLinks.queroDesconto);
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  } else if (siteSettings.buttonLinks.queroDesconto.startsWith('http')) {
+                    window.open(siteSettings.buttonLinks.queroDesconto, '_blank');
+                  }
+                }}
                 type="submit"
                 className="bg-white text-purple-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-colors relative overflow-hidden group"
               >

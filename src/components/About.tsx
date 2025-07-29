@@ -189,7 +189,14 @@ const About = () => {
               <motion.button
                 whileHover={{ scale: 1.1, boxShadow: "0 10px 30px rgba(255,255,255,0.3)" }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => window.location.href = siteSettings.buttonLinks.queroDesconto}
+                onClick={() => {
+                  const element = document.querySelector(siteSettings.buttonLinks.queroDesconto);
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  } else if (siteSettings.buttonLinks.queroDesconto.startsWith('http')) {
+                    window.open(siteSettings.buttonLinks.queroDesconto, '_blank');
+                  }
+                }}
                 className="bg-white text-purple-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors"
               >
                 🛍️ Quero Meu Desconto
@@ -197,7 +204,11 @@ const About = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => window.location.href = siteSettings.buttonLinks.falarWhatsApp}
+                onClick={() => {
+                  if (siteSettings.buttonLinks.falarWhatsApp.startsWith('http')) {
+                    window.open(siteSettings.buttonLinks.falarWhatsApp, '_blank');
+                  }
+                }}
                 className="border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-purple-600 transition-colors"
               >
                 📱 Falar no WhatsApp

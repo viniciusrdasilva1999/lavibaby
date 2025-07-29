@@ -2,24 +2,42 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Star, ShoppingCart, Heart, Eye } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import UserLogin from './UserLogin';
-import UserRegistration from './UserRegistration';
+import ProductModal from './ProductModal';
 
-const FeaturedProducts = () => {
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  originalPrice: number;
+  image: string;
+  rating: number;
+  badge: string;
+  badgeColor: string;
+  description: string;
+  sizes: string[];
+  colors: string[];
+  category: string;
+}
+
+interface FeaturedProductsProps {
+  onAddToCart: (product: Product, size: string, quantity: number) => void;
+}
+
+const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart }) => {
   const { isLoggedIn, siteSettings } = useAuth();
-  const [showLoginModal, setShowLoginModal] = React.useState(false);
-  const [showRegistrationModal, setShowRegistrationModal] = React.useState(false);
+  const [selectedProduct, setSelectedProduct] = React.useState<Product | null>(null);
+  const [showProductModal, setShowProductModal] = React.useState(false);
 
-  const handleAddToCart = () => {
-    if (!isLoggedIn) {
-      setShowRegistrationModal(true);
-    } else {
-      // Adicionar ao carrinho
-      alert('Produto adicionado ao carrinho!');
-    }
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setShowProductModal(true);
   };
 
-  const products = [
+  const handleAddToCart = (product: Product, size: string, quantity: number) => {
+    onAddToCart(product, size, quantity);
+  };
+
+  const products: Product[] = [
     {
       id: 1,
       name: "Vestido Princesa Rosa",
@@ -28,7 +46,11 @@ const FeaturedProducts = () => {
       image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
       rating: 5,
       badge: "Mais Vendido",
-      badgeColor: "bg-gradient-to-r from-purple-500 to-pink-500"
+      badgeColor: "bg-gradient-to-r from-purple-500 to-pink-500",
+      description: "Lindo vestido rosa perfeito para ocasiões especiais. Feito com tecido macio e confortável.",
+      sizes: ["2", "4", "6", "8", "10"],
+      colors: ["Rosa", "Lilás"],
+      category: "Meninas"
     },
     {
       id: 2,
@@ -38,7 +60,11 @@ const FeaturedProducts = () => {
       image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
       rating: 4,
       badge: "Oferta",
-      badgeColor: "bg-gradient-to-r from-pink-500 to-blue-500"
+      badgeColor: "bg-gradient-to-r from-pink-500 to-blue-500",
+      description: "Conjunto aventureiro ideal para brincadeiras ao ar livre. Resistente e estiloso.",
+      sizes: ["2", "4", "6", "8"],
+      colors: ["Azul", "Verde"],
+      category: "Meninos"
     },
     {
       id: 3,
@@ -48,7 +74,11 @@ const FeaturedProducts = () => {
       image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
       rating: 5,
       badge: "Novo",
-      badgeColor: "bg-gradient-to-r from-blue-500 to-purple-500"
+      badgeColor: "bg-gradient-to-r from-blue-500 to-purple-500",
+      description: "Body fofo com estampa de unicórnio. 100% algodão, ideal para bebês.",
+      sizes: ["RN", "P", "M", "G"],
+      colors: ["Branco", "Rosa Claro"],
+      category: "Bebês"
     },
     {
       id: 4,
@@ -58,7 +88,11 @@ const FeaturedProducts = () => {
       image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
       rating: 4,
       badge: "Promoção",
-      badgeColor: "bg-gradient-to-r from-purple-500 to-pink-500"
+      badgeColor: "bg-gradient-to-r from-purple-500 to-pink-500",
+      description: "Macacão colorido e divertido. Perfeito para o dia a dia dos pequenos.",
+      sizes: ["1", "2", "3", "4"],
+      colors: ["Colorido", "Arco-íris"],
+      category: "Unissex"
     }
   ];
 
@@ -147,6 +181,7 @@ const FeaturedProducts = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    onClick={() => handleProductClick(product)}
                     className="bg-white text-purple-600 px-4 py-2 rounded-full font-semibold shadow-lg flex items-center space-x-2"
                   >
                     <Eye size={16} />
@@ -191,12 +226,12 @@ const FeaturedProducts = () => {
                 <motion.button
                   whileHover={{ scale: 1.02, boxShadow: "0 10px 25px rgba(168, 85, 247, 0.3)" }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={handleAddToCart}
+                  onClick={() => handleProductClick(product)}
                   className="w-full bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2 relative overflow-hidden group"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-700 via-pink-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <ShoppingCart size={18} className="relative z-10" />
-                  <span className="relative z-10">Adicionar ao Carrinho</span>
+                  <span className="relative z-10">Ver Produto</span>
                 </motion.button>
               </div>
             </motion.div>
@@ -222,23 +257,15 @@ const FeaturedProducts = () => {
         </motion.div>
       </div>
 
-      {/* Login Modal */}
-      {showLoginModal && (
-        <UserLogin
-          onClose={() => setShowLoginModal(false)}
-          onSwitchToRegister={() => {
-            setShowLoginModal(false);
-            setShowRegistrationModal(true);
-          }}
-          onSuccess={() => setShowLoginModal(false)}
-        />
-      )}
-
-      {/* Registration Modal */}
-      {showRegistrationModal && (
-        <UserRegistration
-          onClose={() => setShowRegistrationModal(false)}
-          onSuccess={() => setShowRegistrationModal(false)}
+      {/* Product Modal */}
+      <ProductModal
+        product={selectedProduct}
+        isOpen={showProductModal}
+        onClose={() => {
+          setShowProductModal(false);
+          setSelectedProduct(null);
+        }}
+        onAddToCart={handleAddToCart}
         />
       )}
     </section>
