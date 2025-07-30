@@ -173,39 +173,123 @@ const Navbar: React.FC<NavbarProps> = ({ cartItemCount, onCartClick }) => {
             <div className="flex flex-col space-y-4">
               <motion.a 
                 whileHover={{ x: 10, color: "#ec4899" }}
-                href="#inicio" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setIsOpen(false);
+                }}
                 className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
               >
                 Início
               </motion.a>
               <motion.a 
                 whileHover={{ x: 10, color: "#ec4899" }}
-                href="#categorias" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.querySelector('#categorias');
+                  if (element) element.scrollIntoView({ behavior: 'smooth' });
+                  setIsOpen(false);
+                }}
                 className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
               >
                 Categorias
               </motion.a>
               <motion.a 
                 whileHover={{ x: 10, color: "#ec4899" }}
-                href="#produtos" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.querySelector('#produtos');
+                  if (element) element.scrollIntoView({ behavior: 'smooth' });
+                  setIsOpen(false);
+                }}
                 className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
               >
                 Produtos
               </motion.a>
               <motion.a 
                 whileHover={{ x: 10, color: "#ec4899" }}
-                href="#sobre" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.querySelector('#sobre');
+                  if (element) element.scrollIntoView({ behavior: 'smooth' });
+                  setIsOpen(false);
+                }}
                 className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
               >
                 Sobre
               </motion.a>
               <motion.a 
                 whileHover={{ x: 10, color: "#ec4899" }}
-                href="#contato" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.querySelector('#newsletter');
+                  if (element) element.scrollIntoView({ behavior: 'smooth' });
+                  setIsOpen(false);
+                }}
                 className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
               >
                 Contato
               </motion.a>
+              
+              {/* Mobile Icons */}
+              <div className="flex items-center justify-around pt-4 border-t border-pink-100">
+                <motion.button 
+                  whileHover={{ scale: 1.2, rotate: 10 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-2 text-gray-700 hover:text-pink-500 transition-colors"
+                >
+                  <Search size={20} />
+                </motion.button>
+                <motion.button 
+                  whileHover={{ scale: 1.2, rotate: 10 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-2 text-gray-700 hover:text-pink-500 transition-colors"
+                >
+                  <Heart size={20} />
+                </motion.button>
+                <motion.button 
+                  whileHover={{ scale: 1.2, rotate: 10 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => {
+                    handleUserIconClick();
+                    setIsOpen(false);
+                  }}
+                  className="p-2 text-gray-700 hover:text-pink-500 transition-colors"
+                >
+                  {isLoggedIn ? (
+                    <div className="relative">
+                      {isAdmin ? (
+                        <Shield size={20} className="text-purple-500" />
+                      ) : (
+                        <Settings size={20} className="text-pink-500" />
+                      )}
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
+                    </div>
+                  ) : (
+                    <User size={20} />
+                  )}
+                </motion.button>
+                <motion.button 
+                  whileHover={{ scale: 1.2, rotate: 10 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => {
+                    onCartClick();
+                    setIsOpen(false);
+                  }}
+                  className="p-2 text-gray-700 hover:text-pink-500 transition-colors relative"
+                >
+                  <ShoppingBag size={20} />
+                  {cartItemCount > 0 && (
+                    <motion.span 
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="absolute -top-1 -right-1 w-5 h-5 bg-pink-500 text-white text-xs rounded-full flex items-center justify-center"
+                    >
+                      {cartItemCount}
+                    </span>
+                  )}
+                </motion.button>
+              </div>
             </div>
           </motion.div>
         )}

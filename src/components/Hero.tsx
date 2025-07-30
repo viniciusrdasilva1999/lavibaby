@@ -226,8 +226,8 @@ const Hero = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => {
-                    const element = document.querySelector(siteSettings.buttonLinks.comprarAgora);
-                    if (element) {
+                    if (siteSettings.buttonLinks.comprarAgora.startsWith('#')) {
+                      const element = document.querySelector(siteSettings.buttonLinks.comprarAgora);
                       element.scrollIntoView({ behavior: 'smooth' });
                     } else if (siteSettings.buttonLinks.comprarAgora.startsWith('http')) {
                       window.open(siteSettings.buttonLinks.comprarAgora, '_blank');
