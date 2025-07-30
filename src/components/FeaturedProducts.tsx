@@ -21,9 +21,10 @@ interface Product {
 
 interface FeaturedProductsProps {
   onAddToCart: (product: Product, size: string, quantity: number) => void;
+  selectedCategory?: string | null;
 }
 
-const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart }) => {
+const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart, selectedCategory }) => {
   const { siteSettings } = useAuth();
   const [selectedProduct, setSelectedProduct] = React.useState<Product | null>(null);
   const [showProductModal, setShowProductModal] = React.useState(false);
@@ -50,7 +51,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart }) => {
       description: "Lindo vestido rosa perfeito para ocasiões especiais. Feito com tecido macio e confortável.",
       sizes: ["2", "4", "6", "8", "10"],
       colors: ["Rosa", "Lilás"],
-      category: "Meninas"
+      category: "meninas"
     },
     {
       id: 2,
@@ -64,7 +65,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart }) => {
       description: "Conjunto aventureiro ideal para brincadeiras ao ar livre. Resistente e estiloso.",
       sizes: ["2", "4", "6", "8"],
       colors: ["Azul", "Verde"],
-      category: "Meninos"
+      category: "meninos"
     },
     {
       id: 3,
@@ -78,7 +79,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart }) => {
       description: "Body fofo com estampa de unicórnio. 100% algodão, ideal para bebês.",
       sizes: ["RN", "P", "M", "G"],
       colors: ["Branco", "Rosa Claro"],
-      category: "Bebês"
+      category: "bebes"
     },
     {
       id: 4,
@@ -92,10 +93,42 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart }) => {
       description: "Macacão colorido e divertido. Perfeito para o dia a dia dos pequenos.",
       sizes: ["1", "2", "3", "4"],
       colors: ["Colorido", "Arco-íris"],
-      category: "Unissex"
+      category: "meninas"
+    },
+    {
+      id: 5,
+      name: "Camiseta Super Herói",
+      price: 49.90,
+      originalPrice: 69.90,
+      image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
+      rating: 5,
+      badge: "Novo",
+      badgeColor: "bg-gradient-to-r from-blue-500 to-green-500",
+      description: "Camiseta de super herói para os pequenos aventureiros.",
+      sizes: ["2", "4", "6", "8", "10"],
+      colors: ["Azul", "Vermelho"],
+      category: "meninos"
+    },
+    {
+      id: 6,
+      name: "Tiara Princesa",
+      price: 29.90,
+      originalPrice: 39.90,
+      image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
+      rating: 4,
+      badge: "Acessório",
+      badgeColor: "bg-gradient-to-r from-pink-500 to-purple-500",
+      description: "Linda tiara para completar o look de princesa.",
+      sizes: ["Único"],
+      colors: ["Rosa", "Dourado"],
+      category: "acessorios"
     }
   ];
 
+  // Filtrar produtos por categoria se selecionada
+  const filteredProducts = selectedCategory 
+    ? products.filter(product => product.category === selectedCategory)
+    : products;
   return (
     <section id="produtos" className="py-20 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 relative overflow-hidden">
       {/* Candy Background Elements */}
@@ -130,18 +163,31 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart }) => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-            Produtos em{' '}
+            {selectedCategory ? `Produtos - ${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}` : 'Produtos em'}{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500">
-              Destaque
+              {selectedCategory ? '' : 'Destaque'}
             </span>
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Descubra nossa seleção especial de roupas que fazem sucesso entre as famílias
+            {selectedCategory 
+              ? `Confira nossa seleção especial para ${selectedCategory}`
+              : 'Descubra nossa seleção especial de roupas que fazem sucesso entre as famílias'
+            }
           </p>
+          {selectedCategory && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => window.location.reload()}
+              className="mt-4 bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300 transition-colors"
+            >
+              Ver Todos os Produtos
+            </motion.button>
+          )}
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product, index) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+          {filteredProducts.map((product, index) => (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, y: 50 }}
@@ -248,7 +294,16 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart }) => {
           <motion.button
             whileHover={{ scale: 1.05, boxShadow: "0 15px 35px rgba(168, 85, 247, 0.4)" }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => window.location.href = siteSettings.buttonLinks.verTodosProdutos}
+            onClick={() => {
+              if (siteSettings.buttonLinks.verTodosProdutos.startsWith('#')) {
+                const element = document.querySelector(siteSettings.buttonLinks.verTodosProdutos);
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth' });
+                }
+              } else if (siteSettings.buttonLinks.verTodosProdutos.startsWith('http')) {
+                window.open(siteSettings.buttonLinks.verTodosProdutos, '_blank');
+              }
+            }}
             className="bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white px-12 py-4 rounded-full text-lg font-bold hover:shadow-lg transition-all duration-300 relative overflow-hidden group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-purple-700 via-pink-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

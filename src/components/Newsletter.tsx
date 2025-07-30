@@ -9,13 +9,17 @@ const Newsletter = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle newsletter subscription
-    console.log('Newsletter subscription:', email);
-    setEmail('');
+    if (email) {
+      // Simular cadastro na newsletter
+      alert(`🎉 Parabéns! Você ganhou 20% de desconto! Use o cupom: NEWSLETTER20\n\nEmail cadastrado: ${email}\n\nEm breve você receberá ofertas exclusivas!`);
+      setEmail('');
+    } else {
+      alert('Por favor, digite seu email para ganhar o desconto!');
+    }
   };
 
   return (
-    <section className="py-20 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 relative overflow-hidden">
+    <section id="newsletter" className="py-20 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 relative overflow-hidden">
       {/* Candy Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div 
@@ -91,14 +95,7 @@ const Newsletter = () => {
               <motion.button
                 whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(255,255,255,0.3)" }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  const element = document.querySelector(siteSettings.buttonLinks.queroDesconto);
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
-                  } else if (siteSettings.buttonLinks.queroDesconto.startsWith('http')) {
-                    window.open(siteSettings.buttonLinks.queroDesconto, '_blank');
-                  }
-                }}
+                onClick={handleSubmit}
                 type="submit"
                 className="bg-white text-purple-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-colors relative overflow-hidden group"
               >

@@ -5,33 +5,49 @@ import { useAuth } from '../contexts/AuthContext';
 const categories = [
   {
     name: 'Meninas',
+    id: 'meninas',
     image: 'https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400',
     color: 'from-pink-400 via-pink-500 to-rose-400',
     items: '150+ produtos'
   },
   {
     name: 'Meninos',
+    id: 'meninos',
     image: 'https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400',
     color: 'from-orange-400 via-orange-500 to-yellow-400',
     items: '120+ produtos'
   },
   {
     name: 'Bebês',
+    id: 'bebes',
     image: 'https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400',
     color: 'from-yellow-400 via-yellow-500 to-orange-400',
     items: '80+ produtos'
   },
   {
     name: 'Acessórios',
+    id: 'acessorios',
     image: 'https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400',
     color: 'from-pink-400 via-rose-400 to-pink-500',
     items: '50+ produtos'
   }
 ];
 
-const Categories = () => {
+interface CategoriesProps {
+  onCategorySelect: (category: string) => void;
+}
+
+const Categories: React.FC<CategoriesProps> = ({ onCategorySelect }) => {
   const { siteSettings } = useAuth();
 
+  const handleCategoryClick = (categoryId: string) => {
+    onCategorySelect(categoryId);
+    // Scroll para seção de produtos
+    const element = document.querySelector('#produtos');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   return (
     <section id="categorias" className="py-20 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden">
       {/* Candy Background Elements */}
@@ -84,6 +100,7 @@ const Categories = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               whileHover={{ y: -15, scale: 1.05, rotateY: 5 }}
+              onClick={() => handleCategoryClick(category.id)}
               className="group cursor-pointer"
             >
               <div className="relative overflow-hidden rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500">
@@ -133,6 +150,12 @@ const Categories = () => {
         >
           <motion.div
             whileHover={{ scale: 1.02 }}
+            onClick={() => {
+              const element = document.querySelector('#produtos');
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
             className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-3xl p-8 text-white relative overflow-hidden cursor-pointer"
           >
             <motion.div
@@ -147,14 +170,6 @@ const Categories = () => {
             <motion.button
               whileHover={{ scale: 1.1, boxShadow: "0 10px 30px rgba(255,255,255,0.3)" }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                const element = document.querySelector(siteSettings.buttonLinks.verOfertas);
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth' });
-                } else if (siteSettings.buttonLinks.verOfertas.startsWith('http')) {
-                  window.open(siteSettings.buttonLinks.verOfertas, '_blank');
-                }
-              }}
               className="bg-white text-purple-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors"
             >
               🛒 Ver Ofertas Imperdíveis

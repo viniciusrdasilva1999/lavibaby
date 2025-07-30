@@ -25,18 +25,18 @@ const AppContent = () => {
   const [currentView, setCurrentView] = useState<'home' | 'checkout' | 'success'>('home');
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [showUserRegistration, setShowUserRegistration] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const handleAddToCart = (product: any, size: string, quantity: number) => {
-    if (!isLoggedIn) {
+    if (!user) {
       setShowUserRegistration(true);
       return;
     }
     cart.addToCart(product, size, quantity);
-    cart.openCart();
   };
 
   const handleCheckout = () => {
-    if (!isLoggedIn) {
+    if (!user) {
       setShowUserRegistration(true);
       return;
     }
@@ -51,6 +51,7 @@ const AppContent = () => {
 
   const handleBackToHome = () => {
     setCurrentView('home');
+    setSelectedCategory(null);
   };
 
   if (isAdmin) {
@@ -80,8 +81,11 @@ const AppContent = () => {
           onCartClick={cart.openCart}
         />
         <Hero />
-        <Categories />
-        <FeaturedProducts onAddToCart={handleAddToCart} />
+        <Categories onCategorySelect={setSelectedCategory} />
+        <FeaturedProducts 
+          onAddToCart={handleAddToCart} 
+          selectedCategory={selectedCategory}
+        />
         <About />
         <Testimonials />
         <Newsletter />

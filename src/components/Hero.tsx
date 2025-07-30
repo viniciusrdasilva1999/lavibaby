@@ -91,8 +91,8 @@ const Hero = () => {
                 whileHover={{ scale: 1.05, boxShadow: "0 15px 35px rgba(236, 72, 153, 0.4)" }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  const element = document.querySelector(siteSettings.buttonLinks.verColecao);
-                  if (element) {
+                  if (siteSettings.buttonLinks.verColecao.startsWith('#')) {
+                    const element = document.querySelector(siteSettings.buttonLinks.verColecao);
                     element.scrollIntoView({ behavior: 'smooth' });
                   } else if (siteSettings.buttonLinks.verColecao.startsWith('http')) {
                     window.open(siteSettings.buttonLinks.verColecao, '_blank');
@@ -109,8 +109,8 @@ const Hero = () => {
                 whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(168, 85, 247, 0.3)" }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  const element = document.querySelector(siteSettings.buttonLinks.ofertas);
-                  if (element) {
+                  if (siteSettings.buttonLinks.ofertas.startsWith('#')) {
+                    const element = document.querySelector(siteSettings.buttonLinks.ofertas);
                     element.scrollIntoView({ behavior: 'smooth' });
                   } else if (siteSettings.buttonLinks.ofertas.startsWith('http')) {
                     window.open(siteSettings.buttonLinks.ofertas, '_blank');
