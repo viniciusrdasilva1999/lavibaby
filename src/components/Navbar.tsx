@@ -286,7 +286,7 @@ const Navbar: React.FC<NavbarProps> = ({ cartItemCount, onCartClick }) => {
                       className="absolute -top-1 -right-1 w-5 h-5 bg-pink-500 text-white text-xs rounded-full flex items-center justify-center"
                     >
                       {cartItemCount}
-                    </span>
+                    </motion.span>
                   )}
                 </motion.button>
               </div>
