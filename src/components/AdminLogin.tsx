@@ -141,7 +141,8 @@ const AdminLogin = () => {
           <h3 className="font-semibold text-blue-800 mb-2">Credenciais de Teste:</h3>
           <p className="text-sm text-blue-700">
             <strong>Email:</strong> admin@lavibaby.com<br />
-            <strong>Senha:</strong> admin123
+            <strong>Senha:</strong> admin123<br />
+            <strong>Status:</strong> Sistema Online ✅
           </p>
         </div>
       </motion.div>

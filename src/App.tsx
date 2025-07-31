@@ -54,6 +54,8 @@ const AppContent = () => {
     setSelectedCategory(null);
   };
 
+  // Debug: Log do estado do admin
+  console.log('Admin Status:', { user, isAdmin, userRole: user?.role });
   if (isAdmin) {
     return <AdminDashboard />;
   }

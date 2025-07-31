@@ -142,9 +142,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Simular delay de autenticação
     await new Promise(resolve => setTimeout(resolve, 1000));
     
+    // Verificar credenciais de admin primeiro
     if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
       setUser(ADMIN_CREDENTIALS.user);
       localStorage.setItem('user', JSON.stringify(ADMIN_CREDENTIALS.user));
+      setIsLoading(false);
+      return true;
+    }
+    
+    // Se não for admin, verificar usuários registrados
+    const foundUser = registeredUsers.find(
+      u => u.user.email === email && u.password === password
+    );
+    
+    if (foundUser) {
+      setUser(foundUser.user);
+      localStorage.setItem('user', JSON.stringify(foundUser.user));
       setIsLoading(false);
       return true;
     }

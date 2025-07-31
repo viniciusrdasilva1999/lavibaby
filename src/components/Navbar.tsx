@@ -23,18 +23,23 @@ const Navbar: React.FC<NavbarProps> = ({ cartItemCount, onCartClick }) => {
   const handleUserIconClick = () => {
     if (isLoggedIn) {
       if (isAdmin) {
-        // Admin já tem acesso ao dashboard
+        // Admin já tem acesso ao dashboard - não fazer nada
         return;
       } else {
         // Usuário normal - mostrar perfil
         setShowUserProfile(true);
       }
     } else {
-      // Se não estiver logado, mostrar login
+      // Se não estiver logado, mostrar opções de login
       setShowUserLogin(true);
     }
   };
 
+  const handleAdminAccess = () => {
+    if (!isLoggedIn) {
+      setShowAdminLogin(true);
+    }
+  };
   return (
     <>
     <motion.nav
@@ -96,6 +101,14 @@ const Navbar: React.FC<NavbarProps> = ({ cartItemCount, onCartClick }) => {
             >
               Contato
             </motion.a>
+            {/* Link Admin */}
+            <motion.button
+              whileHover={{ scale: 1.1, color: "#8b5cf6" }}
+              onClick={handleAdminAccess}
+              className="text-gray-700 hover:text-purple-500 transition-colors font-medium text-sm"
+            >
+              Admin
+            </motion.button>
           </div>
 
           {/* Icons */}
