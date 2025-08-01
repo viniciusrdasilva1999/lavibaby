@@ -190,7 +190,6 @@ const About = () => {
                 whileHover={{ scale: 1.1, boxShadow: "0 10px 30px rgba(255,255,255,0.3)" }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  // Scroll para newsletter para ganhar desconto
                   const element = document.querySelector('#newsletter');
                   if (element) {
                     element.scrollIntoView({ behavior: 'smooth' });

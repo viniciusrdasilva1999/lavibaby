@@ -18,6 +18,7 @@ import Checkout from './components/Checkout';
 import OrderSuccess from './components/OrderSuccess';
 import UserLogin from './components/UserLogin';
 import UserRegistration from './components/UserRegistration';
+import LoginPrompt from './components/LoginPrompt';
 
 const AppContent = () => {
   const { user, isAdmin } = useAuth();
@@ -25,11 +26,12 @@ const AppContent = () => {
   const [currentView, setCurrentView] = useState<'home' | 'checkout' | 'success'>('home');
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [showUserRegistration, setShowUserRegistration] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const handleAddToCart = (product: any, size: string, quantity: number) => {
     if (!user) {
-      setShowUserRegistration(true);
+      setShowLoginPrompt(true);
       return;
     }
     cart.addToCart(product, size, quantity);
@@ -37,7 +39,7 @@ const AppContent = () => {
 
   const handleCheckout = () => {
     if (!user) {
-      setShowUserRegistration(true);
+      setShowLoginPrompt(true);
       return;
     }
     cart.closeCart();
@@ -121,6 +123,22 @@ const AppContent = () => {
         <UserRegistration
           onClose={() => setShowUserRegistration(false)}
           onSuccess={() => setShowUserRegistration(false)}
+        />
+      )}
+
+      {/* Login Prompt Modal */}
+      {showLoginPrompt && (
+        <LoginPrompt
+          isOpen={showLoginPrompt}
+          onClose={() => setShowLoginPrompt(false)}
+          onLogin={() => {
+            setShowLoginPrompt(false);
+            setShowUserLogin(true);
+          }}
+          onRegister={() => {
+            setShowLoginPrompt(false);
+            setShowUserRegistration(true);
+          }}
         />
       )}
     </>

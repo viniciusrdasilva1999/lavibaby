@@ -91,12 +91,8 @@ const Hero = () => {
                 whileHover={{ scale: 1.05, boxShadow: "0 15px 35px rgba(236, 72, 153, 0.4)" }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  if (siteSettings.buttonLinks.verColecao.startsWith('#')) {
-                    const element = document.querySelector(siteSettings.buttonLinks.verColecao);
-                    element.scrollIntoView({ behavior: 'smooth' });
-                  } else if (siteSettings.buttonLinks.verColecao.startsWith('http')) {
-                    window.open(siteSettings.buttonLinks.verColecao, '_blank');
-                  }
+                  const element = document.querySelector('#categorias');
+                  if (element) element.scrollIntoView({ behavior: 'smooth' });
                 }}
                 className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2 relative overflow-hidden group"
               >
@@ -109,12 +105,8 @@ const Hero = () => {
                 whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(168, 85, 247, 0.3)" }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  if (siteSettings.buttonLinks.ofertas.startsWith('#')) {
-                    const element = document.querySelector(siteSettings.buttonLinks.ofertas);
-                    element.scrollIntoView({ behavior: 'smooth' });
-                  } else if (siteSettings.buttonLinks.ofertas.startsWith('http')) {
-                    window.open(siteSettings.buttonLinks.ofertas, '_blank');
-                  }
+                  const element = document.querySelector('#produtos');
+                  if (element) element.scrollIntoView({ behavior: 'smooth' });
                 }}
                 className="border-2 border-pink-500 text-pink-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-pink-500 hover:text-white transition-all duration-300 relative overflow-hidden group"
               >

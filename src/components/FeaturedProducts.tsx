@@ -295,14 +295,8 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart, select
             whileHover={{ scale: 1.05, boxShadow: "0 15px 35px rgba(168, 85, 247, 0.4)" }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              if (siteSettings.buttonLinks.verTodosProdutos.startsWith('#')) {
-                const element = document.querySelector(siteSettings.buttonLinks.verTodosProdutos);
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth' });
-                }
-              } else if (siteSettings.buttonLinks.verTodosProdutos.startsWith('http')) {
-                window.open(siteSettings.buttonLinks.verTodosProdutos, '_blank');
-              }
+              // Scroll to top to show all products
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className="bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white px-12 py-4 rounded-full text-lg font-bold hover:shadow-lg transition-all duration-300 relative overflow-hidden group"
           >

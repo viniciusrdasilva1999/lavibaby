@@ -68,35 +68,54 @@ const Navbar: React.FC<NavbarProps> = ({ cartItemCount, onCartClick }) => {
           <div className="hidden md:flex items-center space-x-8">
             <motion.a 
               whileHover={{ scale: 1.1, color: "#ec4899" }}
-              href="#inicio" 
+              onClick={(e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
             >
               Início
             </motion.a>
             <motion.a 
               whileHover={{ scale: 1.1, color: "#ec4899" }}
-              href="#categorias" 
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.querySelector('#categorias');
+                if (element) element.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
             >
               Categorias
             </motion.a>
             <motion.a 
               whileHover={{ scale: 1.1, color: "#ec4899" }}
-              href="#produtos" 
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.querySelector('#produtos');
+                if (element) element.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
             >
               Produtos
             </motion.a>
             <motion.a 
               whileHover={{ scale: 1.1, color: "#ec4899" }}
-              href="#sobre" 
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.querySelector('#sobre');
+                if (element) element.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
             >
               Sobre
             </motion.a>
             <motion.a 
               whileHover={{ scale: 1.1, color: "#ec4899" }}
-              href="#contato" 
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.querySelector('#newsletter');
+                if (element) element.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="text-gray-700 hover:text-pink-500 transition-colors font-medium"
             >
               Contato

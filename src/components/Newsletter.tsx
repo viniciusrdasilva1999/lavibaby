@@ -10,8 +10,12 @@ const Newsletter = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      // Simular cadastro na newsletter
-      alert(`🎉 Parabéns! Você ganhou 20% de desconto! Use o cupom: NEWSLETTER20\n\nEmail cadastrado: ${email}\n\nEm breve você receberá ofertas exclusivas!`);
+      // Show success message with discount code
+      const message = `🎉 Parabéns! Você ganhou ${siteSettings.discountPercentage}% de desconto!\n\n` +
+                     `📧 Email cadastrado: ${email}\n` +
+                     `🎫 Use o cupom: NEWSLETTER${siteSettings.discountPercentage}\n\n` +
+                     `✨ Em breve você receberá ofertas exclusivas!`;
+      alert(message);
       setEmail('');
     } else {
       alert('Por favor, digite seu email para ganhar o desconto!');

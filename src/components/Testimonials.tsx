@@ -80,6 +80,26 @@ const Testimonials: React.FC = () => {
             </motion.div>
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="text-center mt-12"
+        >
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              const message = `Olá! Gostaria de deixar minha avaliação sobre os produtos da LaviBaby 👶⭐`;
+              window.open(`https://wa.me/5511999999999?text=${encodeURIComponent(message)}`, '_blank');
+            }}
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all"
+          >
+            ⭐ Deixar Avaliação
+          </motion.button>
+        </motion.div>
       </div>
     </section>
   );
