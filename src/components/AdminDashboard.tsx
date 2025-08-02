@@ -26,6 +26,7 @@ import {
   Info
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import ImageUpload from './ImageUpload';
 
 interface Product {
   id: number;
@@ -554,12 +555,10 @@ const AdminDashboard = () => {
                 className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 text-sm md:text-base"
                 rows={3}
               />
-              <input
-                type="url"
-                placeholder="URL da imagem"
-                value={newProduct.image}
-                onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
-                className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 text-sm md:text-base"
+              <ImageUpload
+                currentImage={newProduct.image}
+                onImageChange={(imageBase64) => setNewProduct({...newProduct, image: imageBase64})}
+                label="Imagem do Produto"
               />
               
               <div className="flex space-x-3">
@@ -634,6 +633,11 @@ const AdminDashboard = () => {
                 onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})}
                 className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 text-sm md:text-base"
                 rows={3}
+              />
+              <ImageUpload
+                currentImage={editingProduct.image}
+                onImageChange={(imageBase64) => setEditingProduct({...editingProduct, image: imageBase64})}
+                label="Imagem do Produto"
               />
               <div className="flex items-center space-x-2">
                 <input
@@ -728,6 +732,17 @@ const AdminDashboard = () => {
                     placeholder="5511999999999"
                   />
                 </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Horário de Funcionamento</label>
+                  <input
+                    type="text"
+                    value={tempSettings.workingHours}
+                    onChange={(e) => setTempSettings({...tempSettings, workingHours: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 text-sm md:text-base"
+                    placeholder="Seg-Sex: 8h às 18h"
+                  />
+                </div>
               </div>
 
               {/* Content */}
@@ -773,6 +788,15 @@ const AdminDashboard = () => {
                     className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 text-sm md:text-base"
                   />
                 </div>
+              </div>
+              
+              {/* Logo Upload */}
+              <div>
+                <ImageUpload
+                  currentImage={tempSettings.logoUrl}
+                  onImageChange={(imageBase64) => setTempSettings({...tempSettings, logoUrl: imageBase64})}
+                  label="Logo da Empresa"
+                />
               </div>
             </div>
             
