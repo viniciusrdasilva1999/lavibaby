@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { User, Lock, MapPin, Phone, Mail, Eye, EyeOff, X, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { formatCPF, formatCEP, formatPhone, validateEmail, validateCPF, validateCEP } from '../utils/formatters';
+import { buscarCEP } from '../services/cepService';
+import { ESTADOS_BRASIL } from '../utils/constants';
 
 interface UserRegistrationProps {
   onClose: () => void;
@@ -84,7 +87,7 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ onClose, onSuccess 
       return false;
     }
     
-    if (cpf.replace(/\D/g, '').length !== 11) {
+    if (!validateCPF(cpf)) {
       setError('CPF deve ter 11 dígitos');
       return false;
     }
@@ -99,8 +102,7 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ onClose, onSuccess 
       return false;
     }
     
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!validateEmail(email)) {
       setError('Email inválido');
       return false;
     }
@@ -116,7 +118,7 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ onClose, onSuccess 
       return false;
     }
     
-    if (cep.replace(/\D/g, '').length !== 8) {
+    if (!validateCEP(cep)) {
       setError('CEP deve ter 8 dígitos');
       return false;
     }
@@ -176,24 +178,19 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ onClose, onSuccess 
     }
   };
 
-  const buscarCEP = async (cep: string) => {
-    const cepLimpo = cep.replace(/\D/g, '');
-    if (cepLimpo.length === 8) {
-      try {
-        const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
-        const data = await response.json();
-        
-        if (!data.erro) {
-          setFormData(prev => ({
-            ...prev,
-            endereco: data.logradouro,
-            bairro: data.bairro,
-            cidade: data.localidade,
-            estado: data.uf
-          }));
-        }
-      } catch (error) {
-        console.log('Erro ao buscar CEP');
+  const handleCEPChange = async (cep: string) => {
+    handleInputChange('cep', cep);
+    
+    if (validateCEP(cep)) {
+      const cepData = await buscarCEP(cep);
+      if (cepData) {
+        setFormData(prev => ({
+          ...prev,
+          endereco: cepData.logradouro,
+          bairro: cepData.bairro,
+          cidade: cepData.localidade,
+          estado: cepData.uf
+        }));
       }
     }
   };
@@ -350,12 +347,7 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ onClose, onSuccess 
                 <input
                   type="text"
                   value={formData.cep}
-                  onChange={(e) => {
-                    handleInputChange('cep', e.target.value);
-                    if (e.target.value.replace(/\D/g, '').length === 8) {
-                      buscarCEP(e.target.value);
-                    }
-                  }}
+                  onChange={(e) => handleCEPChange(e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                   placeholder="00000-000"
                   maxLength={9}
@@ -428,33 +420,9 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ onClose, onSuccess 
                     className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                   >
                     <option value="">Selecione</option>
-                    <option value="AC">AC</option>
-                    <option value="AL">AL</option>
-                    <option value="AP">AP</option>
-                    <option value="AM">AM</option>
-                    <option value="BA">BA</option>
-                    <option value="CE">CE</option>
-                    <option value="DF">DF</option>
-                    <option value="ES">ES</option>
-                    <option value="GO">GO</option>
-                    <option value="MA">MA</option>
-                    <option value="MT">MT</option>
-                    <option value="MS">MS</option>
-                    <option value="MG">MG</option>
-                    <option value="PA">PA</option>
-                    <option value="PB">PB</option>
-                    <option value="PR">PR</option>
-                    <option value="PE">PE</option>
-                    <option value="PI">PI</option>
-                    <option value="RJ">RJ</option>
-                    <option value="RN">RN</option>
-                    <option value="RS">RS</option>
-                    <option value="RO">RO</option>
-                    <option value="RR">RR</option>
-                    <option value="SC">SC</option>
-                    <option value="SP">SP</option>
-                    <option value="SE">SE</option>
-                    <option value="TO">TO</option>
+                    {ESTADOS_BRASIL.map(estado => (
+                      <option key={estado} value={estado}>{estado}</option>
+                    ))}
                   </select>
                 </div>
               </div>

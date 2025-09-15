@@ -2,22 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Star, ShoppingCart, Heart, Eye } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useProducts } from '../hooks/useProducts';
+import { Product } from '../types';
 import ProductModal from './ProductModal';
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  originalPrice: number;
-  image: string;
-  rating: number;
-  badge: string;
-  badgeColor: string;
-  description: string;
-  sizes: string[];
-  colors: string[];
-  category: string;
-}
 
 interface FeaturedProductsProps {
   onAddToCart: (product: Product, size: string, quantity: number) => void;
@@ -26,6 +13,7 @@ interface FeaturedProductsProps {
 
 const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart, selectedCategory }) => {
   const { siteSettings } = useAuth();
+  const { products } = useProducts();
   const [selectedProduct, setSelectedProduct] = React.useState<Product | null>(null);
   const [showProductModal, setShowProductModal] = React.useState(false);
 
@@ -38,97 +26,11 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart, select
     onAddToCart(product, size, quantity);
   };
 
-  const products: Product[] = [
-    {
-      id: 1,
-      name: "Vestido Princesa Rosa",
-      price: 89.90,
-      originalPrice: 129.90,
-      image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
-      rating: 5,
-      badge: "Mais Vendido",
-      badgeColor: "bg-gradient-to-r from-purple-500 to-pink-500",
-      description: "Lindo vestido rosa perfeito para ocasiões especiais. Feito com tecido macio e confortável.",
-      sizes: ["2", "4", "6", "8", "10"],
-      colors: ["Rosa", "Lilás"],
-      category: "meninas"
-    },
-    {
-      id: 2,
-      name: "Conjunto Aventureiro",
-      price: 69.90,
-      originalPrice: 99.90,
-      image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
-      rating: 4,
-      badge: "Oferta",
-      badgeColor: "bg-gradient-to-r from-pink-500 to-blue-500",
-      description: "Conjunto aventureiro ideal para brincadeiras ao ar livre. Resistente e estiloso.",
-      sizes: ["2", "4", "6", "8"],
-      colors: ["Azul", "Verde"],
-      category: "meninos"
-    },
-    {
-      id: 3,
-      name: "Body Bebê Unicórnio",
-      price: 39.90,
-      originalPrice: 59.90,
-      image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
-      rating: 5,
-      badge: "Novo",
-      badgeColor: "bg-gradient-to-r from-blue-500 to-purple-500",
-      description: "Body fofo com estampa de unicórnio. 100% algodão, ideal para bebês.",
-      sizes: ["RN", "P", "M", "G"],
-      colors: ["Branco", "Rosa Claro"],
-      category: "bebes"
-    },
-    {
-      id: 4,
-      name: "Macacão Colorido",
-      price: 79.90,
-      originalPrice: 119.90,
-      image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
-      rating: 4,
-      badge: "Promoção",
-      badgeColor: "bg-gradient-to-r from-purple-500 to-pink-500",
-      description: "Macacão colorido e divertido. Perfeito para o dia a dia dos pequenos.",
-      sizes: ["1", "2", "3", "4"],
-      colors: ["Colorido", "Arco-íris"],
-      category: "meninas"
-    },
-    {
-      id: 5,
-      name: "Camiseta Super Herói",
-      price: 49.90,
-      originalPrice: 69.90,
-      image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
-      rating: 5,
-      badge: "Novo",
-      badgeColor: "bg-gradient-to-r from-blue-500 to-green-500",
-      description: "Camiseta de super herói para os pequenos aventureiros.",
-      sizes: ["2", "4", "6", "8", "10"],
-      colors: ["Azul", "Vermelho"],
-      category: "meninos"
-    },
-    {
-      id: 6,
-      name: "Tiara Princesa",
-      price: 29.90,
-      originalPrice: 39.90,
-      image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
-      rating: 4,
-      badge: "Acessório",
-      badgeColor: "bg-gradient-to-r from-pink-500 to-purple-500",
-      description: "Linda tiara para completar o look de princesa.",
-      sizes: ["Único"],
-      colors: ["Rosa", "Dourado"],
-      category: "acessorios"
-    }
-  ];
-
   // Filtrar produtos por categoria se selecionada
   const filteredProducts = selectedCategory 
     ? products.filter(product => product.category === selectedCategory)
     : products;
+
   return (
     <section id="produtos" className="py-20 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 relative overflow-hidden">
       {/* Candy Background Elements */}
@@ -232,7 +134,10 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ onAddToCart, select
                   >
                     <Eye size={16} />
                     <span>Ver Detalhes</span>
-                  </motion.button>
+                  {product.originalPrice > product.price ? 
+                    `-${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%` : 
+                    'Novo'
+                  }
                 </div>
               </div>
 

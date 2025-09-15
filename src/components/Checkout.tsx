@@ -2,15 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CreditCard, Truck, MapPin, User, Phone, Mail } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-  size?: string;
-}
+import { CartItem } from '../types';
 
 interface CheckoutProps {
   items: CartItem[];

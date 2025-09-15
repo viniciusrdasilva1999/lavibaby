@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { User, Lock, MapPin, Phone, Mail, Eye, EyeOff, X, Save, LogOut, Edit } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { formatPhone, formatCEP, validateEmail, validateCEP } from '../utils/formatters';
+import { buscarCEP } from '../services/cepService';
+import { ESTADOS_BRASIL } from '../utils/constants';
 
 interface UserProfileProps {
   onClose: () => void;
@@ -76,27 +79,22 @@ const UserProfile: React.FC<UserProfileProps> = ({ onClose, onLogout }) => {
     }
   };
 
-  const buscarCEP = async (cep: string) => {
-    const cepLimpo = cep.replace(/\D/g, '');
-    if (cepLimpo.length === 8) {
-      try {
-        const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
-        const data = await response.json();
-        
-        if (!data.erro) {
-          setFormData(prev => ({
-            ...prev,
-            endereco: {
-              ...prev.endereco,
-              endereco: data.logradouro,
-              bairro: data.bairro,
-              cidade: data.localidade,
-              estado: data.uf
-            }
-          }));
-        }
-      } catch (error) {
-        console.log('Erro ao buscar CEP');
+  const handleCEPChange = async (cep: string) => {
+    handleInputChange('endereco.cep', cep);
+    
+    if (validateCEP(cep)) {
+      const cepData = await buscarCEP(cep);
+      if (cepData) {
+        setFormData(prev => ({
+          ...prev,
+          endereco: {
+            ...prev.endereco,
+            endereco: cepData.logradouro,
+            bairro: cepData.bairro,
+            cidade: cepData.localidade,
+            estado: cepData.uf
+          }
+        }));
       }
     }
   };
@@ -269,12 +267,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onClose, onLogout }) => {
                     <input
                       type="text"
                       value={formData.endereco.cep}
-                      onChange={(e) => {
-                        handleInputChange('endereco.cep', e.target.value);
-                        if (e.target.value.replace(/\D/g, '').length === 8) {
-                          buscarCEP(e.target.value);
-                        }
-                      }}
+                      onChange={(e) => handleCEPChange(e.target.value)}
                       disabled={!isEditing}
                       className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 disabled:bg-gray-100"
                       maxLength={9}

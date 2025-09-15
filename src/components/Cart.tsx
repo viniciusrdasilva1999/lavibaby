@@ -1,22 +1,14 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, X, Plus, Minus, Trash2, CreditCard } from 'lucide-react';
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-  size?: string;
-}
+import { CartItem } from '../types';
 
 interface CartProps {
   isOpen: boolean;
   onClose: () => void;
   items: CartItem[];
-  onUpdateQuantity: (id: number, quantity: number) => void;
-  onRemoveItem: (id: number) => void;
+  onUpdateQuantity: (id: number, quantity: number, size?: string) => void;
+  onRemoveItem: (id: number, size?: string) => void;
   onCheckout: () => void;
 }
 
@@ -117,14 +109,14 @@ const Cart: React.FC<CartProps> = ({
                       <div className="flex items-center justify-between mt-3">
                         <div className="flex items-center space-x-3">
                           <button
-                            onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                            onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1), item.size)}
                             className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
                           >
                             <Minus size={14} />
                           </button>
                           <span className="font-semibold">{item.quantity}</span>
                           <button
-                            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => onUpdateQuantity(item.id, item.quantity + 1, item.size)}
                             className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
                           >
                             <Plus size={14} />

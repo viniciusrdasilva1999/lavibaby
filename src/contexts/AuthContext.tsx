@@ -1,53 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-interface SiteSettings {
-  companyName: string;
-  phone: string;
-  email: string;
-  address: string;
-  instagram: string;
-  facebook: string;
-  twitter: string;
-  whatsapp: string;
-  workingHours: string;
-  heroTitle: string;
-  heroSubtitle: string;
-  aboutTitle: string;
-  aboutDescription: string;
-  freeShippingMinValue: number;
-  discountPercentage: number;
-  logoUrl: string;
-  buttonLinks: {
-    verColecao: string;
-    ofertas: string;
-    verOfertas: string;
-    comprarAgora: string;
-    queroDesconto: string;
-    falarWhatsApp: string;
-    verTodosProdutos: string;
-    baixarApp: string;
-    criarConta: string;
-  };
-}
-
-interface User {
-  id: string;
-  email: string;
-  role: 'admin' | 'user';
-  name: string;
-  cpf?: string;
-  telefone?: string;
-  endereco?: {
-    cep: string;
-    endereco: string;
-    numero: string;
-    complemento: string;
-    bairro: string;
-    cidade: string;
-    estado: string;
-  };
-  aceitaNewsletter?: boolean;
-}
+import { User, SiteSettings } from '../types';
 
 interface AuthContextType {
   user: User | null;

@@ -1,26 +1,5 @@
 import { useState, useEffect } from 'react';
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-  size?: string;
-}
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  originalPrice: number;
-  image: string;
-  rating: number;
-  description: string;
-  sizes: string[];
-  colors: string[];
-  category: string;
-}
+import { CartItem, Product } from '../types';
 
 export const useCart = () => {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -45,7 +24,7 @@ export const useCart = () => {
     );
 
     if (existingItem) {
-      updateQuantity(existingItem.id, existingItem.quantity + quantity);
+      updateQuantity(existingItem.id, existingItem.quantity + quantity, existingItem.size);
     } else {
       const newItem: CartItem = {
         id: product.id,
@@ -59,21 +38,21 @@ export const useCart = () => {
     }
   };
 
-  const updateQuantity = (id: number, quantity: number) => {
+  const updateQuantity = (id: number, quantity: number, size?: string) => {
     if (quantity <= 0) {
-      removeItem(id);
+      removeItem(id, size);
       return;
     }
 
     setItems(prev =>
       prev.map(item =>
-        item.id === id ? { ...item, quantity } : item
+        item.id === id && item.size === size ? { ...item, quantity } : item
       )
     );
   };
 
-  const removeItem = (id: number) => {
-    setItems(prev => prev.filter(item => item.id !== id));
+  const removeItem = (id: number, size?: string) => {
+    setItems(prev => prev.filter(item => !(item.id === id && item.size === size)));
   };
 
   const clearCart = () => {

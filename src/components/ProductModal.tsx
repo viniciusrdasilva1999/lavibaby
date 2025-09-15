@@ -1,19 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw } from 'lucide-react';
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  originalPrice: number;
-  image: string;
-  rating: number;
-  description: string;
-  sizes: string[];
-  colors: string[];
-  category: string;
-}
+import { Product } from '../types';
 
 interface ProductModalProps {
   product: Product | null;
@@ -44,7 +32,8 @@ const ProductModal: React.FC<ProductModalProps> = ({
     onClose();
   };
 
-  const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+  const discount = product.originalPrice > product.price ? 
+    Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0;
 
   return (
     <AnimatePresence>

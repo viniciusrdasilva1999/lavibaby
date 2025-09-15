@@ -26,94 +26,64 @@ import {
   Info
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useProducts } from '../hooks/useProducts';
+import { Product } from '../types';
 import ImageUpload from './ImageUpload';
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  originalPrice: number;
-  image: string;
-  category: string;
-  description: string;
-  inStock: boolean;
-}
 
 const AdminDashboard = () => {
   const { logout, user, siteSettings, updateSiteSettings } = useAuth();
+  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
   const [activeTab, setActiveTab] = useState('products');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [editingSettings, setEditingSettings] = useState(false);
   const [tempSettings, setTempSettings] = useState(siteSettings);
 
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: 1,
-      name: "Vestido Princesa Rosa",
-      price: 89.90,
-      originalPrice: 129.90,
-      image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
-      category: "Meninas",
-      description: "Lindo vestido rosa para princesas",
-      inStock: true
-    },
-    {
-      id: 2,
-      name: "Conjunto Aventureiro",
-      price: 69.90,
-      originalPrice: 99.90,
-      image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
-      category: "Meninos",
-      description: "Conjunto perfeito para aventuras",
-      inStock: true
-    },
-    {
-      id: 3,
-      name: "Body Bebê Unicórnio",
-      price: 39.90,
-      originalPrice: 59.90,
-      image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=400",
-      category: "Bebês",
-      description: "Body fofo com estampa de unicórnio",
-      inStock: false
-    }
-  ]);
-
   const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
     name: '',
     price: 0,
     originalPrice: 0,
     image: '',
-    category: 'Meninas',
+    category: 'meninas',
     description: '',
-    inStock: true
+    inStock: true,
+    rating: 5,
+    badge: 'Novo',
+    badgeColor: 'bg-gradient-to-r from-purple-500 to-pink-500',
+    sizes: [],
+    colors: []
   });
 
   const handleSaveProduct = () => {
     if (editingProduct) {
-      setProducts(products.map(p => p.id === editingProduct.id ? editingProduct : p));
+      updateProduct(editingProduct.id, editingProduct);
       setEditingProduct(null);
     }
   };
 
   const handleAddProduct = () => {
-    const id = Math.max(...products.map(p => p.id)) + 1;
-    setProducts([...products, { ...newProduct, id }]);
+    addProduct(newProduct);
     setNewProduct({
       name: '',
       price: 0,
       originalPrice: 0,
       image: '',
-      category: 'Meninas',
+      category: 'meninas',
       description: '',
-      inStock: true
+      inStock: true,
+      rating: 5,
+      badge: 'Novo',
+      badgeColor: 'bg-gradient-to-r from-purple-500 to-pink-500',
+      sizes: [],
+      colors: []
     });
     setIsAddingProduct(false);
   };
 
   const handleDeleteProduct = (id: number) => {
-    setProducts(products.filter(p => p.id !== id));
+    if (confirm('Tem certeza que deseja excluir este produto?')) {
+      deleteProduct(id);
+    }
   };
 
   const handleSaveSettings = () => {
@@ -543,10 +513,10 @@ const AdminDashboard = () => {
                 onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
                 className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 text-sm md:text-base"
               >
-                <option value="Meninas">Meninas</option>
-                <option value="Meninos">Meninos</option>
-                <option value="Bebês">Bebês</option>
-                <option value="Acessórios">Acessórios</option>
+                <option value="meninas">Meninas</option>
+                <option value="meninos">Meninos</option>
+                <option value="bebes">Bebês</option>
+                <option value="acessorios">Acessórios</option>
               </select>
               <textarea
                 placeholder="Descrição"
@@ -623,10 +593,10 @@ const AdminDashboard = () => {
                 onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
                 className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 text-sm md:text-base"
               >
-                <option value="Meninas">Meninas</option>
-                <option value="Meninos">Meninos</option>
-                <option value="Bebês">Bebês</option>
-                <option value="Acessórios">Acessórios</option>
+                <option value="meninas">Meninas</option>
+                <option value="meninos">Meninos</option>
+                <option value="bebes">Bebês</option>
+                <option value="acessorios">Acessórios</option>
               </select>
               <textarea
                 value={editingProduct.description}
