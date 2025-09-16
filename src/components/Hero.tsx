@@ -124,6 +124,10 @@ const Hero = () => {
             >
               <motion.div
                 whileHover={{ scale: 1.02, y: -2 }}
+                onClick={() => {
+                  const element = document.querySelector('#produtos');
+                  if (element) element.scrollIntoView({ behavior: 'smooth' });
+                }}
                 className="bg-gradient-to-r from-pink-500 to-purple-500 text-white p-4 rounded-2xl cursor-pointer shadow-lg"
               >
                 <div className="flex items-center justify-between">
@@ -218,12 +222,8 @@ const Hero = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => {
-                    if (siteSettings.buttonLinks.comprarAgora.startsWith('#')) {
-                      const element = document.querySelector(siteSettings.buttonLinks.comprarAgora);
-                      element.scrollIntoView({ behavior: 'smooth' });
-                    } else if (siteSettings.buttonLinks.comprarAgora.startsWith('http')) {
-                      window.open(siteSettings.buttonLinks.comprarAgora, '_blank');
-                    }
+                    const element = document.querySelector('#produtos');
+                    if (element) element.scrollIntoView({ behavior: 'smooth' });
                   }}
                   className="bg-white text-pink-600 px-6 py-3 rounded-full font-semibold shadow-lg"
                 >

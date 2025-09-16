@@ -1,11 +1,14 @@
 import React from 'react';
-import { Star, ShoppingCart } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Eye, Plus } from 'lucide-react';
 import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../hooks/useCart';
 import { formatCurrency } from '../utils/formatters';
+import ProductModal from './ProductModal';
 
 const FeaturedProducts: React.FC = () => {
   const { products } = useProducts();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const { addToCart } = useCart();
 
   // Get featured products (first 6 products)
@@ -20,6 +23,21 @@ const FeaturedProducts: React.FC = () => {
       size,
       quantity: 1
     });
+  };
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setShowModal(true);
+  };
+
+  const handleQuickAdd = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation();
+    const defaultSize = product.sizes.length > 0 ? product.sizes[0] : '';
+    onAddToCart(product, defaultSize, 1);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedProduct(null);
   };
 
   if (featuredProducts.length === 0) {
@@ -38,7 +56,8 @@ const FeaturedProducts: React.FC = () => {
   return (
     <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+    <>
+      <section id="produtos" className="py-20 bg-gradient-to-br from-cyan-50 via-purple-50 to-pink-50 relative overflow-hidden">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Produtos em Destaque</h2>
           <p className="text-lg text-gray-600">Descubra nossa seleção especial de produtos</p>
         </div>
@@ -85,9 +104,10 @@ const FeaturedProducts: React.FC = () => {
                   >
                     <ShoppingCart className="w-4 h-4" />
                     <span>Adicionar</span>
+                    onClick={(e) => handleQuickAdd(e, product)}
                   </button>
                 </div>
-
+                    <Plus size={18} />
                 {product.sizes && product.sizes.length > 0 && (
                   <div className="mt-4">
                     <p className="text-sm text-gray-600 mb-2">Tamanhos disponíveis:</p>
@@ -95,9 +115,14 @@ const FeaturedProducts: React.FC = () => {
                       {product.sizes.map((size: string) => (
                         <button
                           key={size}
+                onClick={() => handleProductClick(product)}
                           onClick={() => handleAddToCart(product, size)}
                           className="px-3 py-1 text-xs border border-gray-300 rounded hover:bg-gray-100 transition-colors duration-200"
                         >
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleProductClick(product);
+                    }}
                           {size}
                         </button>
                       ))}
@@ -109,14 +134,26 @@ const FeaturedProducts: React.FC = () => {
           ))}
         </div>
 
+            onClick={() => {
+              // Scroll to top to show all products
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
         <div className="text-center mt-12">
           <button className="bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200">
             Ver Todos os Produtos
           </button>
         </div>
       </div>
-    </section>
+      </section>
   );
 };
 
+      {/* Product Modal */}
+      <ProductModal
+        product={selectedProduct}
+        isOpen={showModal}
+        onClose={closeModal}
+        onAddToCart={onAddToCart}
+      />
+    </>
 export default FeaturedProducts;
