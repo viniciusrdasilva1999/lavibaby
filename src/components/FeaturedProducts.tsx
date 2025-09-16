@@ -117,3 +117,6 @@ const FeaturedProducts: React.FC = () => {
       </div>
     </section>
   );
+};
+
+export default FeaturedProducts;
