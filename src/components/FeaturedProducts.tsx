@@ -4,7 +4,7 @@ import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../hooks/useCart';
 import { formatCurrency } from '../utils/formatters';
 
-export const FeaturedProducts: React.FC = () => {
+const FeaturedProducts: React.FC = () => {
   const { products } = useProducts();
   const { addToCart } = useCart();
 
@@ -117,4 +117,3 @@ export const FeaturedProducts: React.FC = () => {
       </div>
     </section>
   );
-};
