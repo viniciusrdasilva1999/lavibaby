@@ -2,7 +2,7 @@ import React from 'react';
 import { Star, ShoppingCart } from 'lucide-react';
 import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../hooks/useCart';
-import { formatPrice } from '../utils/formatters';
+import { formatCurrency } from '../utils/formatters';
 
 export const FeaturedProducts: React.FC = () => {
   const { products } = useProducts();
@@ -77,7 +77,7 @@ export const FeaturedProducts: React.FC = () => {
 
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-gray-900">
-                    {formatPrice(product.price)}
+                    {formatCurrency(product.price)}
                   </span>
                   <button
                     onClick={() => handleAddToCart(product)}
