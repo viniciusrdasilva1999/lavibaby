@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CreditCard, Truck, MapPin, User, Phone, Mail } from 'lucide-react';
+import { ArrowLeft, CreditCard, Truck, MapPin, User, Phone, Mail, Copy, Check, AlertCircle, Loader } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { CartItem } from '../types';
+import { processPayment, validateCreditCard, getCardBrand, calculateInstallments, PaymentData } from '../services/paymentService';
+import { formatCPF, formatPhone } from '../utils/formatters';
 
 interface CheckoutProps {
   items: CartItem[];
@@ -15,16 +17,170 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack, onOrderComplete }) =
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('credit');
   const [shippingMethod, setShippingMethod] = useState('standard');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
+  const [paymentResult, setPaymentResult] = useState<any>(null);
+  const [copiedPix, setCopiedPix] = useState(false);
+  
+  // Dados do formulário
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.telefone || '',
+    document: user?.cpf || '',
+    address: {
+      street: user?.endereco?.endereco || '',
+      number: user?.endereco?.numero || '',
+      complement: user?.endereco?.complemento || '',
+      neighborhood: user?.endereco?.bairro || '',
+      city: user?.endereco?.cidade || '',
+      state: user?.endereco?.estado || '',
+      zipCode: user?.endereco?.cep || ''
+    }
+  });
+  
+  // Dados do cartão
+  const [cardData, setCardData] = useState({
+    number: '',
+    holderName: '',
+    expiryMonth: '',
+    expiryYear: '',
+    cvv: '',
+    installments: 1
+  });
   
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = shippingMethod === 'express' ? 15.90 : subtotal >= 150 ? 0 : 9.90;
   const total = subtotal + shipping;
+  const installmentOptions = calculateInstallments(total);
 
-  const handleCompleteOrder = () => {
-    // Simular processamento do pedido
-    setTimeout(() => {
-      onOrderComplete();
-    }, 2000);
+  const formatCardNumber = (value: string) => {
+    return value
+      .replace(/\s/g, '')
+      .replace(/(.{4})/g, '$1 ')
+      .trim()
+      .substring(0, 19);
+  };
+
+  const formatExpiry = (value: string) => {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{2})(\d)/, '$1/$2')
+      .substring(0, 5);
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    if (field.includes('.')) {
+      const [parent, child] = field.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent as keyof typeof prev] as any,
+          [child]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
+  };
+
+  const handleCardChange = (field: string, value: string) => {
+    let formattedValue = value;
+    
+    if (field === 'number') {
+      formattedValue = formatCardNumber(value);
+    } else if (field === 'expiryMonth' || field === 'expiryYear') {
+      const expiry = formatExpiry(value);
+      const [month, year] = expiry.split('/');
+      setCardData(prev => ({
+        ...prev,
+        expiryMonth: month || '',
+        expiryYear: year || ''
+      }));
+      return;
+    } else if (field === 'cvv') {
+      formattedValue = value.replace(/\D/g, '').substring(0, 4);
+    }
+    
+    setCardData(prev => ({ ...prev, [field]: formattedValue }));
+  };
+
+  const validateForm = () => {
+    if (!formData.name || !formData.email || !formData.phone) {
+      setPaymentError('Preencha todos os campos obrigatórios');
+      return false;
+    }
+    
+    if (paymentMethod === 'credit') {
+      if (!cardData.number || !cardData.holderName || !cardData.expiryMonth || !cardData.expiryYear || !cardData.cvv) {
+        setPaymentError('Preencha todos os dados do cartão');
+        return false;
+      }
+      
+      if (!validateCreditCard(cardData.number)) {
+        setPaymentError('Número do cartão inválido');
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
+  const handleCompleteOrder = async () => {
+    if (!validateForm()) return;
+    
+    setIsProcessing(true);
+    setPaymentError('');
+    
+    try {
+      const paymentData: PaymentData = {
+        method: paymentMethod as 'credit' | 'pix' | 'boleto',
+        amount: total,
+        customerData: {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          document: formData.document,
+          address: formData.address
+        }
+      };
+      
+      if (paymentMethod === 'credit') {
+        paymentData.creditCard = {
+          number: cardData.number.replace(/\s/g, ''),
+          holderName: cardData.holderName,
+          expiryMonth: cardData.expiryMonth,
+          expiryYear: cardData.expiryYear,
+          cvv: cardData.cvv
+        };
+      }
+      
+      const result = await processPayment(paymentData);
+      
+      if (result.success) {
+        setPaymentResult(result);
+        if (result.status === 'approved') {
+          // Para cartão aprovado, finalizar pedido
+          setTimeout(() => {
+            onOrderComplete();
+          }, 3000);
+        }
+      } else {
+        setPaymentError(result.error || 'Erro no processamento do pagamento');
+      }
+    } catch (error) {
+      setPaymentError('Erro inesperado. Tente novamente.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const copyPixCode = () => {
+    if (paymentResult?.pixCode) {
+      navigator.clipboard.writeText(paymentResult.pixCode);
+      setCopiedPix(true);
+      setTimeout(() => setCopiedPix(false), 2000);
+    }
   };
 
   return (
@@ -170,8 +326,16 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack, onOrderComplete }) =
                 <button
                   onClick={() => setStep(2)}
                   className="w-full mt-6 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all"
+                  disabled={isProcessing}
                 >
-                  Continuar para Pagamento
+                  {isProcessing ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <Loader className="animate-spin" size={20} />
+                      <span>Processando...</span>
+                    </div>
+                  ) : (
+                    'Finalizar Pedido'
+                  )}
                 </button>
               </motion.div>
             )}
@@ -239,12 +403,31 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack, onOrderComplete }) =
                   {paymentMethod === 'credit' && (
                     <div className="space-y-4 mt-6 p-4 bg-gray-50 rounded-xl">
                       <div>
-                        <label className="block text-gray-700 font-medium mb-2">Número do Cartão</label>
-                        <input
-                          type="text"
-                          placeholder="0000 0000 0000 0000"
-                          className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
-                        />
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Número do Cartão
+                          {cardData.number && (
+                            <span className="ml-2 text-sm text-blue-600">
+                              {getCardBrand(cardData.number)}
+                            </span>
+                          )}
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={cardData.number}
+                            onChange={(e) => handleCardChange('number', e.target.value)}
+                            placeholder="0000 0000 0000 0000"
+                            className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
+                              cardData.number && !validateCreditCard(cardData.number) 
+                                ? 'border-red-300 bg-red-50' 
+                                : 'border-gray-300'
+                            }`}
+                            maxLength={19}
+                          />
+                          {cardData.number && !validateCreditCard(cardData.number) && (
+                            <AlertCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500" size={20} />
+                          )}
+                        </div>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4">
@@ -252,17 +435,40 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack, onOrderComplete }) =
                           <label className="block text-gray-700 font-medium mb-2">Validade</label>
                           <input
                             type="text"
+                            value={`${cardData.expiryMonth}${cardData.expiryYear ? '/' + cardData.expiryYear : ''}`}
+                            onChange={(e) => handleCardChange('expiryMonth', e.target.value)}
                             placeholder="MM/AA"
                             className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
+                            maxLength={5}
                           />
                         </div>
                         <div>
                           <label className="block text-gray-700 font-medium mb-2">CVV</label>
                           <input
                             type="text"
-                            placeholder="000"
+                            value={cardData.cvv}
+                            onChange={(e) => handleCardChange('cvv', e.target.value)}
+                            placeholder="123"
+                            value={cardData.holderName}
+                            onChange={(e) => handleCardChange('holderName', e.target.value.toUpperCase())}
                             className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
+                            maxLength={4}
                           />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-gray-700 font-medium mb-2">Parcelas</label>
+                          <select
+                            value={cardData.installments}
+                            onChange={(e) => setCardData(prev => ({ ...prev, installments: Number(e.target.value) }))}
+                            className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
+                          >
+                            {installmentOptions.map((option) => (
+                              <option key={option.number} value={option.number}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       </div>
                       
@@ -274,6 +480,40 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack, onOrderComplete }) =
                           className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500"
                         />
                       </div>
+                    </div>
+                  )}
+                  
+                  {paymentMethod === 'pix' && (
+                    <div className="mt-6 p-4 bg-blue-50 rounded-xl">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-sm font-bold">PIX</span>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-blue-800">Pagamento via PIX</h4>
+                          <p className="text-sm text-blue-600">Aprovação instantânea</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-blue-700">
+                        Após confirmar o pedido, você receberá o código PIX para pagamento.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {paymentMethod === 'boleto' && (
+                    <div className="mt-6 p-4 bg-orange-50 rounded-xl">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs">📄</span>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-orange-800">Boleto Bancário</h4>
+                          <p className="text-sm text-orange-600">Vencimento em 3 dias úteis</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-orange-700">
+                        O boleto será gerado após a confirmação do pedido.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -379,8 +619,14 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack, onOrderComplete }) =
                   <div key={item.id} className="flex items-center space-x-3">
                     <img
                       src={item.image}
-                      alt={item.name}
+                      value={formData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
                       className="w-12 h-12 object-cover rounded-lg"
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange('phone', formatPhone(e.target.value))}
+                      required
+                      placeholder="(11) 99999-9999"
+                      required
                     />
                     <div className="flex-1">
                       <p className="font-medium text-sm">{item.name}</p>
@@ -402,8 +648,16 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack, onOrderComplete }) =
                   <span>Frete:</span>
                   <span>{shipping === 0 ? 'Grátis' : `R$ ${shipping.toFixed(2).replace('.', ',')}`}</span>
                 </div>
-                <div className="flex justify-between text-lg font-bold border-t pt-2">
-                  <span>Total:</span>
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    value={`${formData.address.street}, ${formData.address.number}, ${formData.address.neighborhood}, ${formData.address.city} - ${formData.address.state}, ${formData.address.zipCode}`}
+                    onChange={(e) => {
+                      // Para simplificar, vamos manter como readonly e usar os dados do usuário
+                    }}
+                    placeholder="seu@email.com"
+                    required
+                    placeholder="Endereço completo"
+                    readOnly
                   <span className="text-pink-600">R$ {total.toFixed(2).replace('.', ',')}</span>
                 </div>
               </div>
@@ -411,6 +665,123 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack, onOrderComplete }) =
           </div>
         </div>
       </div>
+      
+      {/* Payment Error Modal */}
+      {paymentError && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-2xl p-6 max-w-md w-full"
+          >
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="text-red-500" size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Erro no Pagamento</h3>
+              <p className="text-gray-600 mb-6">{paymentError}</p>
+              <button
+                onClick={() => setPaymentError('')}
+                className="w-full bg-red-500 text-white py-3 rounded-xl font-semibold hover:bg-red-600"
+              >
+                Tentar Novamente
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+      
+      {/* Payment Success Modal */}
+      {paymentResult && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-2xl p-6 max-w-md w-full"
+          >
+            {paymentResult.status === 'approved' && (
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Check className="text-green-500" size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Pagamento Aprovado!</h3>
+                <p className="text-gray-600 mb-4">
+                  Transação: {paymentResult.transactionId}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Redirecionando para confirmação...
+                </p>
+              </div>
+            )}
+            
+            {paymentResult.status === 'pending' && paymentResult.pixCode && (
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-blue-500 font-bold">PIX</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Código PIX Gerado</h3>
+                
+                <div className="bg-gray-50 p-4 rounded-xl mb-4">
+                  <p className="text-xs text-gray-600 mb-2">Código PIX:</p>
+                  <div className="bg-white p-3 rounded border text-xs font-mono break-all">
+                    {paymentResult.pixCode}
+                  </div>
+                </div>
+                
+                <div className="flex space-x-3">
+                  <button
+                    onClick={copyPixCode}
+                    className="flex-1 bg-blue-500 text-white py-3 rounded-xl font-semibold hover:bg-blue-600 flex items-center justify-center space-x-2"
+                  >
+                    {copiedPix ? <Check size={20} /> : <Copy size={20} />}
+                    <span>{copiedPix ? 'Copiado!' : 'Copiar Código'}</span>
+                  </button>
+                  <button
+                    onClick={onOrderComplete}
+                    className="flex-1 bg-green-500 text-white py-3 rounded-xl font-semibold hover:bg-green-600"
+                  >
+                    Continuar
+                  </button>
+                </div>
+                
+                <p className="text-xs text-gray-500 mt-4">
+                  Após o pagamento, seu pedido será processado automaticamente.
+                </p>
+              </div>
+            )}
+            
+            {paymentResult.status === 'pending' && paymentResult.boletoUrl && (
+              <div className="text-center">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-orange-500 text-2xl">📄</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Boleto Gerado</h3>
+                
+                <div className="space-y-3">
+                  <a
+                    href={paymentResult.boletoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 inline-block"
+                  >
+                    Baixar Boleto
+                  </a>
+                  <button
+                    onClick={onOrderComplete}
+                    className="w-full bg-green-500 text-white py-3 rounded-xl font-semibold hover:bg-green-600"
+                  >
+                    Continuar
+                  </button>
+                </div>
+                
+                <p className="text-xs text-gray-500 mt-4">
+                  Vencimento em 3 dias úteis. Após o pagamento, seu pedido será processado.
+                </p>
+              </div>
+            )}
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
